@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.palaspapas</groupId>
-    <artifactId>back</artifactId>
+    <artifactId>back-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>back</name>
-    <description>back</description>
+    <name>back-app</name>
+    <description>palaspapas back-app</description>
     <url/>
     <licenses>
         <license/>
