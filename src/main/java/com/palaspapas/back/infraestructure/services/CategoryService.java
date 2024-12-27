@@ -27,7 +27,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public CategoryResponse read(Long id){
         var categoryFromDB = this.categoryRepository.findById(id).orElseThrow();
-        return this.entityToResponse(categoryFromDB, );
+        return this.entityToResponse(categoryFromDB);
     }
 
     @Override
