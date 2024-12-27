@@ -1,7 +1,6 @@
 package com.palaspapas.back.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(name = "inventario")
-public class Inventario implements Serializable {
+public class Inventory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "inventario-sequence")
     private Long id;
@@ -27,13 +26,10 @@ public class Inventario implements Serializable {
     private String tipo;
     private int total;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDateTime fechaMovimiento;
+    private LocalDateTime moveDate;
 
     @ManyToOne
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @JoinColumn(name = "ingrediente_id")
-    private Ingrediente ingrediente ;
-    @Column(name = "ingrediente_id", insertable = false, updatable = false)
-    private Long ingredienteId;
+    private Ingredient ingredient;
 
 }

@@ -7,16 +7,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "proveedor")
-public class Proveedor implements Serializable {
+@Table(name = "provider")
+public class Provider implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "proveedor-sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "provider-sequence")
     private Long id;
     @Column(unique = true, nullable = false)
     private String empresa;
@@ -37,4 +38,7 @@ public class Proveedor implements Serializable {
     private String telefonoContacto;
     @Column(name = "correo_contacto", nullable = false)
     private String correoContacto;
+
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "provider")
+    private List<Ingredient> ingredients;
 }

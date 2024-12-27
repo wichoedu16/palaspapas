@@ -14,18 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "departamento")
-public class Departamento implements Serializable {
+@Table(name = "category")
+public class Category implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "departamento-sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category-sequence")
     private Long id;
     @Column(unique = true, nullable = false)
     private String description;
     @Column(unique = true, nullable = false)
-    private String code;
+    private String name;
     @Column(nullable = false)
     private String status;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "departamento")
-    private List<Cargo> cargos;
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "category")
+    private List<Product> products;
 }
