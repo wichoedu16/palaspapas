@@ -9,31 +9,38 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Authentication endpoints")
 public class AuthenticationController {
 
     private final IAuthenticationService authenticationService;
-
+    
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("Servicio activo!!");
+    }
+    
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authenticationService.register(request));
+        log.debug("Received registration request for user: {}", request.getUsername());
+        var response = authenticationService.register(request);
+        log.debug("Registration successful for user: {}", request.getUsername());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/authenticate")
-    @Operation(summary = "Authenticate a user")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @Valid @RequestBody AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> authenticate( @Valid @RequestBody AuthenticationRequest request) {
+        log.debug("Recibida solicitud de autenticación para usuario: {}",
+                request.getUsername());
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 }

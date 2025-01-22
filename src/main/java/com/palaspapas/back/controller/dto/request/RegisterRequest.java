@@ -27,4 +27,6 @@ public class RegisterRequest {
     private String email;
 
     private String role;
+
+    private Boolean status;
 }

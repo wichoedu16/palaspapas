@@ -9,13 +9,16 @@ import com.palaspapas.back.persistence.repositories.IUserRepository;
 import com.palaspapas.back.security.jwt.JwtService;
 import com.palaspapas.back.service.interfaces.IAuthenticationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService implements IAuthenticationService {
 
     private final IUserRepository userRepository;
@@ -29,10 +32,6 @@ public class AuthenticationService implements IAuthenticationService {
             throw new BadRequestException("Username already exists");
         }
 
-        if (request.getEmail() != null && userRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Email already exists");
-        }
-
         var user = UserEntity.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -40,6 +39,7 @@ public class AuthenticationService implements IAuthenticationService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .role(request.getRole() != null ? request.getRole() : "USER")
+                .status(request.getStatus())
                 .build();
 
         userRepository.save(user);
@@ -52,19 +52,32 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+        log.debug("Iniciando proceso de autenticación");
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
+            log.debug("Credenciales validadas correctamente");
 
-        var user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new BadRequestException("User not found"));
+            UserEntity user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> {
+                        log.error("Usuario no encontrado: {}", request.getUsername());
+                        return new UsernameNotFoundException("User not found");
+                    });
 
-        var token = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(token)
-                .build();
+            log.debug("Usuario encontrado, generando token");
+            String token = jwtService.generateToken(user);
+            log.debug("Token generado exitosamente");
+
+            return AuthenticationResponse.builder()
+                    .token(token)
+                    .build();
+        } catch (Exception e) {
+            log.error("Error en el proceso de autenticación: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 }
