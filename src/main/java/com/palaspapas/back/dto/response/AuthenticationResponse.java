@@ -1,4 +1,4 @@
-package com.palaspapas.back.controller.dto.response;
+package com.palaspapas.back.dto.response;
 
 
 import lombok.AllArgsConstructor;

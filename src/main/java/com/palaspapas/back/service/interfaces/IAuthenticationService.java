@@ -1,9 +1,9 @@
 package com.palaspapas.back.service.interfaces;
 
 
-import com.palaspapas.back.controller.dto.request.AuthenticationRequest;
-import com.palaspapas.back.controller.dto.request.RegisterRequest;
-import com.palaspapas.back.controller.dto.response.AuthenticationResponse;
+import com.palaspapas.back.dto.request.AuthenticationRequest;
+import com.palaspapas.back.dto.request.RegisterRequest;
+import com.palaspapas.back.dto.response.AuthenticationResponse;
 
 public interface IAuthenticationService {
     AuthenticationResponse register(RegisterRequest request);

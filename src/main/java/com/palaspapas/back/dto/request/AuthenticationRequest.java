@@ -1,4 +1,4 @@
-package com.palaspapas.back.controller.dto.request;
+package com.palaspapas.back.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;

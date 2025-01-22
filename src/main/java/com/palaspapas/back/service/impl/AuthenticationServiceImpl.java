@@ -1,8 +1,8 @@
 package com.palaspapas.back.service.impl;
 
-import com.palaspapas.back.controller.dto.request.AuthenticationRequest;
-import com.palaspapas.back.controller.dto.request.RegisterRequest;
-import com.palaspapas.back.controller.dto.response.AuthenticationResponse;
+import com.palaspapas.back.dto.request.AuthenticationRequest;
+import com.palaspapas.back.dto.request.RegisterRequest;
+import com.palaspapas.back.dto.response.AuthenticationResponse;
 import com.palaspapas.back.exception.BadRequestException;
 import com.palaspapas.back.persistence.entities.UserEntity;
 import com.palaspapas.back.persistence.repositories.IUserRepository;
@@ -15,11 +15,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthenticationService implements IAuthenticationService {
+@Transactional
+public class AuthenticationServiceImpl implements IAuthenticationService {
 
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

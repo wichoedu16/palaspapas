@@ -1,9 +1,8 @@
 package com.palaspapas.back.controller;
 
-
-import com.palaspapas.back.controller.dto.request.AuthenticationRequest;
-import com.palaspapas.back.controller.dto.request.RegisterRequest;
-import com.palaspapas.back.controller.dto.response.AuthenticationResponse;
+import com.palaspapas.back.dto.request.AuthenticationRequest;
+import com.palaspapas.back.dto.request.RegisterRequest;
+import com.palaspapas.back.dto.response.AuthenticationResponse;
 import com.palaspapas.back.service.interfaces.IAuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
