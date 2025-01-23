@@ -45,17 +45,36 @@ public class IngredientServiceImpl implements IIngredientService {
         log.debug("Actualizando ingrediente con ID: {}", id);
         IngredientEntity existingEntity = findEntityById(id);
 
-        validateIngredient(ingredient);
-        validateCategory(ingredient.getCategory().getId());
-
-        if (!existingEntity.getName().equals(ingredient.getName())) {
+        if (ingredient.getName() != null && !existingEntity.getName().equals(ingredient.getName())) {
             validateNameUnique(ingredient.getName());
+            existingEntity.setName(ingredient.getName());
         }
 
-        ingredientMapper.updateEntity(existingEntity, ingredient);
-        IngredientEntity updatedEntity = ingredientRepository.save(existingEntity);
+        if (ingredient.getCategory() != null && ingredient.getCategory().getId() != null) {
+            validateCategory(ingredient.getCategory().getId());
+            existingEntity.setCategory(categoryRepository.findById(ingredient.getCategory().getId())
+                    .orElseThrow(() -> new NotFoundException("Categoría no encontrada con ID: " + ingredient.getCategory().getId())));
+        }
 
+        if (ingredient.getDescription() != null) {
+            existingEntity.setDescription(ingredient.getDescription());
+        }
+
+        if (ingredient.getStock() != null) {
+            existingEntity.setStock(ingredient.getStock());
+        }
+
+        if (ingredient.getMinimumStock() != null) {
+            existingEntity.setMinimumStock(ingredient.getMinimumStock());
+        }
+
+        if (ingredient.getCost() != null) {
+            existingEntity.setCost(ingredient.getCost());
+        }
+
+        IngredientEntity updatedEntity = ingredientRepository.save(existingEntity);
         log.info("Ingrediente actualizado exitosamente");
+
         return ingredientMapper.toDomain(updatedEntity);
     }
 
@@ -139,7 +158,6 @@ public class IngredientServiceImpl implements IIngredientService {
             throw new BusinessException("El nombre no puede exceder los 100 caracteres");
         }
 
-        // Más validaciones...
     }
 
     private void validateCategory(Long categoryId) {

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category extends BaseDomain {
+    private Long id;
     private String name;
     private String description;
     private Boolean isForKitchen; // Para identificar si es para cocina o adicionales

@@ -1,0 +1,161 @@
+{
+  "info": {
+    "name": "PalasPapas API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Autenticación y Usuarios",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.environment.set('jwt_token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/auth/authenticate",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Registrar Usuario",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"vendedor1\",\n    \"password\": \"password123\",\n    \"firstName\": \"Juan\",\n    \"lastName\": \"Pérez\",\n    \"email\": \"juan@example.com\",\n    \"role\": \"SELLER\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Gestión de Caja",
+      "item": [
+        {
+          "name": "Ver Ventas del Día Anterior",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/sales/daily-report?date={{yesterdayDate}}"
+          }
+        },
+        {
+          "name": "Cerrar Caja",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/daily-cash/close",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"date\": \"2024-01-22\",\n    \"closingAmount\": 1500.00,\n    \"notes\": \"Cierre diario normal\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Gestión de Proveedores",
+      "item": [
+        {
+          "name": "Registrar Pago",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/supplier-payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"supplierId\": 1,\n    \"amount\": 500.00,\n    \"documentNumber\": \"TRANS-001\",\n    \"referenceNumber\": \"REF-001\",\n    \"paymentType\": \"TRANSFER\",\n    \"isPartial\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Gestión de Inventario",
+      "item": [
+        {
+          "name": "Listar Ingredientes",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/ingredients"
+          }
+        },
+        {
+          "name": "Verificar Stock Bajo",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/ingredients/low-stock"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Gestión de Ingredientes",
+      "item": [
+        {
+          "name": "Crear Ingrediente",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/ingredients",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Papas\",\n    \"description\": \"Papas frescas\",\n    \"categoryId\": 1,\n    \"unitMeasure\": \"KG\",\n    \"stock\": 100.00,\n    \"minimumStock\": 20.00,\n    \"cost\": 2.50,\n    \"isForKitchen\": true,\n    \"isAddition\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Gestión de Ventas",
+      "item": [
+        {
+          "name": "Crear Venta",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/sales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"details\": [\n        {\n            \"productId\": 1,\n            \"quantity\": 2,\n            \"isAdditional\": false\n        },\n        {\n            \"ingredientId\": 1,\n            \"quantity\": 1,\n            \"isAdditional\": true,\n            \"parentDetailId\": 1\n        }\n    ],\n    \"paymentType\": \"CASH\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Aplicar Descuento",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/api/v1/sales/1/discount",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"discount\": 5.00\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    }
+  ]
+}

@@ -144,15 +144,6 @@ CREATE TABLE sale_details (
                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE sale_detail_additionals (
-                                         id LONG PRIMARY KEY,
-                                         sale_detail_id BIGINT REFERENCES sale_details(id),
-                                         ingredient_id BIGINT REFERENCES ingredients(id),
-                                         quantity DECIMAL(10,2) NOT NULL,
-                                         unit_price DECIMAL(10,2) NOT NULL,
-                                         subtotal DECIMAL(10,2) NOT NULL,
-                                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 CREATE TABLE daily_cash (
                             id LONG PRIMARY KEY,

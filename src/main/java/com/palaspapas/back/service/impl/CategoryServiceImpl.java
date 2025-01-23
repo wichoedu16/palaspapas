@@ -41,12 +41,22 @@ public class CategoryServiceImpl implements ICategoryService {
         log.debug("Actualizando categoría con ID: {}", id);
         CategoryEntity existingEntity = findEntityById(id);
 
-        if (!existingEntity.getName().equals(category.getName())) {
+        if (category.getName() != null && !existingEntity.getName().equals(category.getName())) {
             validateNameUnique(category.getName());
+            existingEntity.setName(category.getName());
         }
 
-        validateCategory(category);
-        categoryMapper.updateEntity(existingEntity, category);
+        if (category.getDescription() != null) {
+            existingEntity.setDescription(category.getDescription());
+        }
+
+        if (category.getIsForKitchen() != null) {
+            existingEntity.setIsForKitchen(category.getIsForKitchen());
+        }
+
+        if (category.getIsAddition() != null) {
+            existingEntity.setIsAddition(category.getIsAddition());
+        }
 
         CategoryEntity updatedEntity = categoryRepository.save(existingEntity);
         log.info("Categoría actualizada exitosamente");
@@ -74,9 +84,6 @@ public class CategoryServiceImpl implements ICategoryService {
     public void delete(Long id) {
         log.debug("Eliminando categoría con ID: {}", id);
         CategoryEntity entity = findEntityById(id);
-
-        // Aquí podrías agregar validaciones adicionales
-        // Por ejemplo, verificar si la categoría está en uso
 
         categoryRepository.delete(entity);
         log.info("Categoría eliminada exitosamente");
@@ -119,6 +126,10 @@ public class CategoryServiceImpl implements ICategoryService {
 
         if (category.getDescription() != null && category.getDescription().length() > 200) {
             throw new BusinessException("La descripción no puede exceder los 200 caracteres");
+        }
+
+        if (category.getDescription().isBlank()) {
+            throw new BusinessException("La descripción no puede estar vacía");
         }
 
         if (category.getIsForKitchen() == null) {
