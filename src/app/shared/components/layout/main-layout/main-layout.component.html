@@ -1,0 +1,14 @@
+<div class="app-container">
+    <!-- Sidebar con estado controlado -->
+    <app-sidebar [class.collapsed]="!isSidebarExpanded"></app-sidebar>
+    
+    <div class="main-content">
+        <!-- Header con evento para controlar el sidebar -->
+        <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+        
+        <!-- Contenido principal -->
+        <main class="content-area">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>

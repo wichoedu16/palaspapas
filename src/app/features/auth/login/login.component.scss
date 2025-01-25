@@ -1,0 +1,59 @@
+.login-container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+
+  mat-card {
+    width: clamp(280px, 90%, 400px);
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 2rem;
+
+    h1 {
+      color: var(--text-secondary);
+      font-size: 2rem;
+      font-weight: 300;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+
+      ::ng-deep {
+
+        // Input transparente con borde
+        .mat-form-field-outline {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+        }
+
+        // Color de texto e iconos
+        .mat-form-field-label,
+        .mat-icon {
+          color: var(--text-secondary);
+        }
+
+        input {
+          color: var(--text-primary);
+        }
+      }
+    }
+
+    button {
+      width: 100%;
+      padding: 1.25rem;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--bg-primary);
+      font-weight: 500;
+
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
+  }
+}

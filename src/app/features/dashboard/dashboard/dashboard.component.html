@@ -1,0 +1,51 @@
+<!-- features/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <!-- Encabezado con saludo personalizado -->
+  <header class="dashboard-header">
+      <h1>Bienvenido, {{(currentUser$ | async)?.firstName}}</h1>
+      <p class="subtitle">Panel de Control</p>
+  </header>
+
+  <!-- Tarjetas de resumen -->
+  <div class="summary-cards">
+      <ng-container *ngFor="let card of summaryCards">
+          <!-- Solo mostramos las tarjetas según el rol del usuario -->
+          <mat-card 
+              *ngIf="!(card.requiresAdmin && (currentUser$ | async)?.role?.name !== 'ADMIN')"
+              [ngClass]="card.color">
+              <mat-card-content>
+                  <div class="card-content">
+                      <div class="card-info">
+                          <h2>{{card.title}}</h2>
+                          <p class="value">{{card.value}}</p>
+                      </div>
+                      <mat-icon [ngClass]="card.color">{{card.icon}}</mat-icon>
+                  </div>
+              </mat-card-content>
+          </mat-card>
+      </ng-container>
+  </div>
+
+  <!-- Panel de acciones rápidas -->
+  <mat-card class="quick-actions" *ngIf="(currentUser$ | async)?.role?.name === 'ADMIN'">
+      <mat-card-header>
+          <mat-card-title>Acciones Rápidas</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+          <div class="action-buttons">
+              <button mat-raised-button color="primary">
+                  <mat-icon>close</mat-icon>
+                  Cerrar Caja
+              </button>
+              <button mat-raised-button color="accent">
+                  <mat-icon>payments</mat-icon>
+                  Registrar Pago
+              </button>
+              <button mat-raised-button color="warn">
+                  <mat-icon>inventory</mat-icon>
+                  Revisar Inventario
+              </button>
+          </div>
+      </mat-card-content>
+  </mat-card>
+</div>

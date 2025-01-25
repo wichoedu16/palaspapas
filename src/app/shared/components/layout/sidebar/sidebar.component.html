@@ -1,0 +1,37 @@
+<!-- shared/components/layout/sidebar/sidebar.component.html -->
+<div class="sidebar">
+    <!-- Sección de logo y título -->
+    <div class="sidebar-header">
+        <div class="logo-container">
+            <img src="assets/logoL.jpeg" alt="Logo" class="logo">
+        </div>
+        <h1 class="app-title">Pa las papas</h1>
+    </div>
+
+    <!-- Navegación principal -->
+    <mat-nav-list class="navigation-list">
+        <ng-container *ngFor="let item of menuItems$ | async">
+            <!-- Item sin submenú -->
+            <a mat-list-item *ngIf="!item.children" [routerLink]="item.route" routerLinkActive="active-link">
+                <mat-icon matListIcon>{{item.icon}}</mat-icon>
+                <span>{{item.label}}</span>
+            </a>
+
+            <!-- Item con submenú -->
+            <mat-expansion-panel *ngIf="item.children" class="nav-expansion-panel">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mat-icon>{{item.icon}}</mat-icon>
+                        <span>{{item.label}}</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <a mat-list-item *ngFor="let child of item.children" [routerLink]="child.route"
+                    routerLinkActive="active-link">
+                    <mat-icon matListIcon>{{child.icon}}</mat-icon>
+                    <span>{{child.label}}</span>
+                </a>
+            </mat-expansion-panel>
+        </ng-container>
+    </mat-nav-list>
+</div>

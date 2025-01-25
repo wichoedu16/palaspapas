@@ -1,1 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  // Colores principales
+  --bg-primary: #f1ede3; // Fondo claro
+  --bg-secondary: #f8f7f1; // Fondo más claro para cards
+  --accent: #FFC107; // Amarillo/dorado para acentos
+  --text-primary: #333333; // Texto oscuro
+  --text-secondary: #666666; // Texto gris
+
+  // Colores de estado  
+  --success: #4CAF50; // Verde para éxito
+  --warning: #FF9800; // Naranja para advertencias
+  --error: #F44336; // Rojo para errores
+
+  // Colores adicionales
+  --border-color: #e0e0e0; // Color para bordes
+  --accent-light: rgba(255, 193, 7, 0.1); // Amarillo claro para hover
+}

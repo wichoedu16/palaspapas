@@ -1,0 +1,97 @@
+<div class="form-container">
+    <h2 mat-dialog-title>{{ isEditing ? 'Editar' : 'Nueva' }} Venta</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div mat-dialog-content class="form-content">
+            <!-- Fecha (Bloqueada) -->
+            <mat-form-field appearance="outline">
+                <mat-label>Fecha</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="saleDate" readonly>
+                <mat-datepicker-toggle matSuffix [for]="picker" disabled></mat-datepicker-toggle>
+                <mat-datepicker #picker disabled></mat-datepicker>
+            </mat-form-field>
+
+            <!-- Detalle de la Venta -->
+            <div class="detail-section">
+                <h3>Detalle de la Venta</h3>
+                <div class="detail-row" *ngFor="let item of saleDetails; let i = index">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Plato</mat-label>
+                        <mat-select [(ngModel)]="item.productId" [ngModelOptions]="{standalone: true}" (ngModelChange)="calculateTotal()">
+                            <mat-option *ngFor="let product of products" [value]="product.id">
+                                {{ product.name }} - ${{ product.price }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Cantidad</mat-label>
+                        <input matInput type="number" [(ngModel)]="item.quantity" [ngModelOptions]="{standalone: true}" min="1" (ngModelChange)="calculateTotal()">
+                    </mat-form-field>
+
+                    <span>Subtotal: ${{ item.subtotal || 0 }}</span>
+
+                    <button mat-icon-button color="warn" (click)="removeDetail(i)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+
+                <button mat-raised-button (click)="addDetail()">
+                    <mat-icon>add</mat-icon> Agregar Plato
+                </button>
+            </div>
+
+            <!-- Total -->
+            <mat-form-field appearance="outline">
+                <mat-label>Total</mat-label>
+                <input matInput type="number" formControlName="totalAmount" placeholder="Total" readonly>
+            </mat-form-field>
+
+            <!-- Descuento -->
+            <mat-form-field appearance="outline">
+                <mat-label>Descuento</mat-label>
+                <input matInput type="number" formControlName="discountAmount" placeholder="Descuento">
+            </mat-form-field>
+
+            <!-- Monto Final -->
+            <mat-form-field appearance="outline">
+                <mat-label>Monto Final</mat-label>
+                <input matInput type="number" formControlName="finalAmount" placeholder="Monto Final" readonly>
+            </mat-form-field>
+
+            <!-- Estado -->
+            <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="status">
+                    <mat-option value="PENDING">Pendiente</mat-option>
+                    <mat-option value="COMPLETED">Completada</mat-option>
+                    <mat-option value="CANCELLED">Cancelada</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Tipo de Pago -->
+            <mat-form-field appearance="outline">
+                <mat-label>Tipo de Pago</mat-label>
+                <mat-select formControlName="paymentType">
+                    <mat-option value="CASH">Efectivo</mat-option>
+                    <mat-option value="CARD">Tarjeta</mat-option>
+                    <mat-option value="TRANSFER">Transferencia</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Notas -->
+            <mat-form-field appearance="outline">
+                <mat-label>Notas</mat-label>
+                <textarea matInput formControlName="notes" rows="3"></textarea>
+            </mat-form-field>
+        </div>
+
+        <!-- Botones de acción -->
+        <div mat-dialog-actions class="form-actions">
+            <button mat-button mat-dialog-close class="cancel-button">Cancelar</button>
+            <button mat-raised-button type="submit" [disabled]="form.invalid" >
+                {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+        </div>
+    </form>
+</div>

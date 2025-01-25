@@ -1,0 +1,87 @@
+<div class="form-container">
+  <h2>{{ data.payment ? 'Editar Pago' : 'Nuevo Pago' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div mat-dialog-content class="form-content">
+      <!-- Proveedor -->
+      <mat-form-field appearance="outline">
+        <mat-label>Proveedor</mat-label>
+        <mat-select formControlName="supplierId">
+          <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
+            {{ supplier.name }} - {{ supplier.documentNumber }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('supplierId')?.invalid">Selecciona un proveedor</mat-error>
+      </mat-form-field>
+
+      <!-- Monto del Pago -->
+      <mat-form-field appearance="outline">
+        <mat-label>Monto del Pago</mat-label>
+        <input matInput type="number" formControlName="amount" (input)="calculateRemainingAmount()">
+        <mat-error *ngIf="form.get('amount')?.invalid">Monto inválido</mat-error>
+      </mat-form-field>
+
+      <!-- Monto Restante -->
+      <div class="amount-info">
+        <p>Monto Total de la Factura: <strong>{{ totalAmount | currency }}</strong></p>
+        <p>Monto Restante: <strong>{{ remainingAmount | currency }}</strong></p>
+      </div>
+
+      <!-- Fecha de Pago -->
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de Pago</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="paymentDate" readonly>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="form.get('paymentDate')?.invalid">Fecha inválida</mat-error>
+      </mat-form-field>
+
+      <!-- Número de Comprobante -->
+      <mat-form-field appearance="outline">
+        <mat-label>Número de Comprobante</mat-label>
+        <input matInput formControlName="documentNumber">
+      </mat-form-field>
+
+      <!-- Número de Referencia -->
+      <mat-form-field appearance="outline">
+        <mat-label>Número de Referencia</mat-label>
+        <input matInput formControlName="referenceNumber">
+      </mat-form-field>
+
+      <!-- Tipo de Pago -->
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de Pago</mat-label>
+        <mat-select formControlName="paymentType">
+          <mat-option value="CASH">Efectivo</mat-option>
+          <mat-option value="TRANSFER">Transferencia</mat-option>
+          <mat-option value="CHECK">Cheque</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('paymentType')?.invalid">Selecciona un tipo de pago</mat-error>
+      </mat-form-field>
+
+      <!-- Notas -->
+      <mat-form-field appearance="outline">
+        <mat-label>Notas</mat-label>
+        <textarea matInput formControlName="notes" rows="3"></textarea>
+      </mat-form-field>
+
+      <!-- Estado del Pago -->
+      <mat-form-field appearance="outline">
+        <mat-label>Estado del Pago</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="PARTIAL">Parcial</mat-option>
+          <mat-option value="COMPLETED">Completado</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('status')?.invalid">Selecciona un estado</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button mat-button type="button" (click)="dialogRef.close()">Cancelar</button>
+      <button mat-raised-button type="submit" [disabled]="form.invalid" color="primary">
+        {{ data.payment ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </form>
+</div>

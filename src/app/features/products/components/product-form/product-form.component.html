@@ -1,0 +1,49 @@
+<div class="form-container">
+    <h2 mat-dialog-title>{{ isEditing ? 'Editar' : 'Nuevo' }} Producto</h2>
+  
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div mat-dialog-content class="form-content">
+        <!-- Nombre -->
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="name" placeholder="Nombre del producto">
+          <mat-error *ngIf="form.get('name')?.errors?.['required']">
+            El nombre es requerido
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Descripción -->
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description" rows="3"></textarea>
+        </mat-form-field>
+  
+        <!-- Precio -->
+        <mat-form-field appearance="outline">
+          <mat-label>Precio</mat-label>
+          <input matInput type="number" formControlName="price" placeholder="Precio">
+          <mat-error *ngIf="form.get('price')?.errors?.['required']">
+            El precio es requerido
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Categoría -->
+        <mat-form-field appearance="outline">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="categoryId">
+            <mat-option *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+  
+      <!-- Botones de acción -->
+      <div mat-dialog-actions class="form-actions">
+        <button mat-button mat-dialog-close class="cancel-button">Cancelar</button>
+        <button mat-raised-button type="submit" [disabled]="form.invalid" class="submit-button">
+          {{ isEditing ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+    </form>
+  </div>

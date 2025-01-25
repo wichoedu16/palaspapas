@@ -1,0 +1,36 @@
+.form-container {
+  padding: 1.5rem;
+
+  h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+
+    .cancel-button {
+      background-color: var(--error); // Rojo para cancelar
+      color: white;
+    }
+
+    submit-button {
+      background-color: #FFC107;
+      color: white;
+  }
+  }
+}

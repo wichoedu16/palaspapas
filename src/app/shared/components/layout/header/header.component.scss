@@ -1,0 +1,43 @@
+.header {
+  height: 75px; // Altura fija para coincidir con el sidebar
+  background: var(--bg-secondary);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+
+  .brand {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 300;
+  }
+
+  .sidebar-toggle {
+    margin-right: 1rem;
+    color: var(--text-secondary);
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+
+  .user-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .user-name {
+      color: var(--text-primary);
+      font-weight: 300;
+    }
+
+    .user-menu-trigger {
+      color: var(--text-secondary);
+
+      &:hover {
+        color: var(--accent);
+      }
+    }
+  }
+}
