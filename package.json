@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:gh-pages": "ng build --base-href https://wichoedu16.github.io/palaspapas/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
