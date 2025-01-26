@@ -97,4 +97,17 @@ public class IngredientController {
         Ingredient ingredient = ingredientService.changeStatus(id, status);
         return ResponseEntity.ok(ingredientDtoMapper.toResponse(ingredient));
     }
+
+    @GetMapping("/low-stock")
+    @Operation(summary = "Obtener ingrediente con stock bajo")
+    public ResponseEntity<List<IngredientResponse>> findLowStock (@RequestParam(required = false) Boolean lowStock) {
+        List<Ingredient> ingredients;
+        ingredients = ingredientService.findLowStock();
+        List<IngredientResponse> response = ingredients.stream()
+                .map(ingredientDtoMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
 }
