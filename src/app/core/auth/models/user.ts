@@ -1,13 +1,17 @@
-import { Role } from "./role";
-
 export interface User {
+  id?: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role?: {
     id: number;
-    username: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: Role;         // Relación con rol
-    status: boolean;
-    createdAt: Date;
-    updatedAt?: Date;
-  }
+    name: string;
+    permissions: Array<{
+      id: number;
+      code: string;
+      name: string;
+    }>;
+  };
+  status: boolean;
+}

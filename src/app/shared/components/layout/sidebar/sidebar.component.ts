@@ -1,16 +1,18 @@
-// shared/components/layout/sidebar/sidebar.component.ts
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+// sidebar.component.ts
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { filter, map, takeUntil, tap } from 'rxjs/operators';
 import { AuthService } from '@core/auth/services/auth.service';
+import { NavigationEnd, Router } from '@angular/router';
 
-// Definimos una interfaz para los ítems del menú
 interface MenuItem {
-  label: string; // Texto que se mostrará
-  icon: string; // Icono de Material
-  route: string; // Ruta de navegación
-  requiredRole?: string; // Rol requerido para ver este ítem
-  children?: MenuItem[]; // Submenús si son necesarios
+  label: string;
+  icon: string;
+  route: string;
+  requiredRole?: string;
+  requiredPermission?: string;
+  children?: MenuItem[];
+  expanded?: boolean; // Para controlar la expansión de submenús
 }
 
 @Component({
@@ -18,105 +20,250 @@ interface MenuItem {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit {
-  // Observable que contendrá los ítems del menú filtrados por rol
-  menuItems$: Observable<MenuItem[]>;
+export class SidebarComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  menuItems$: Observable<MenuItem[]> | undefined;
+  currentUser$ = this.authService.currentUser$;
+  isAdmin = false;
 
-  // Definimos todos los ítems del menú posibles
-  private readonly ALL_MENU_ITEMS: MenuItem[] = [
+  private readonly ADMIN_MENU_ITEMS: MenuItem[] = [
     {
-      label: 'Inicio',
+      label: 'Dashboard',
       icon: 'dashboard',
       route: '/dashboard',
-      requiredRole: 'ANY', 
-    },
-    {
-      label: 'Categorias',
-      icon: 'backup_table',
-      route: '/category',
-      requiredRole: 'ANY',
-    },
-    {
-      label: 'Platos',
-      icon: 'fastfood',
-      route: '/product',
-      requiredRole: 'ANY',
-    },
-    {
-      label: 'Venta',
-      icon: 'add_shopping_cart',
-      route: '/sale',
-      requiredRole: 'ANY',
-    },
-    {
-      label: 'Ingredientes',
-      icon: 'kitchen',
-      route: '/inventory',
-      requiredRole: 'ANY',
+      requiredRole: 'ROLE_ADMIN',
       children: [
+        {
+          label: 'Resumen Ventas',
+          icon: 'bar_chart',
+          route: '/dashboard/sales',
+        },
+        {
+          label: 'Stock Bajo',
+          icon: 'warning',
+          route: '/dashboard/low-stock',
+        }
+      ]
+    },
+    {
+      label: 'Administración',
+      icon: 'admin_panel_settings',
+      route: '/admin',
+      requiredRole: 'ROLE_ADMIN',
+      children: [
+        {
+          label: 'Usuarios',
+          icon: 'people',
+          route: '/admin/users',
+        },
+        {
+          label: 'Roles',
+          icon: 'security',
+          route: '/admin/roles',
+        },
+        {
+          label: 'Permisos',
+          icon: 'key',
+          route: '/admin/permissions',
+        }
+      ]
+    },
+    {
+      label: 'Gestión Inventario',
+      icon: 'inventory',
+      route: '/inventory',
+      requiredRole: 'ROLE_ADMIN',
+      children: [
+        {
+          label: 'Ingredientes',
+          icon: 'kitchen',
+          route: '/inventory/ingredients',
+        },
+        {
+          label: 'Productos',
+          icon: 'fastfood',
+          route: '/inventory/products',
+        },
+        {
+          label: 'Categorías',
+          icon: 'category',
+          route: '/inventory/categories',
+        }
+      ]
+    },
+    {
+      label: 'Reportes',
+      icon: 'assessment',
+      route: '/reports',
+      requiredRole: 'ROLE_ADMIN',
+      children: [
+        {
+          label: 'Ventas',
+          icon: 'point_of_sale',
+          route: '/reports/sales',
+        },
         {
           label: 'Inventario',
-          icon: 'inventory',
-          route: '/inventory',
-          requiredRole: 'ANY'
-        },
-        {
-          label: 'Movimientos',
-          icon: 'sync_alt',
-          route: '/inventory/movements',
-          requiredRole: 'ADMIN',
-        },
-      ],
-    },
+          icon: 'inventory_2',
+          route: '/reports/inventory',
+        }
+      ]
+    }
+  ];
+  
+  private readonly USER_MENU_ITEMS: MenuItem[] = [
     {
-      label: 'Proveedores',
-      icon: 'groups',
-      route: '/supplier',
-      requiredRole: 'ANY',
+      label: 'Dashboard',
+      icon: 'dashboard',
+      route: '/dashboard',
+      requiredRole: 'ROLE_USER',
       children: [
         {
-          label: 'Lista de Proveedores',
-          icon: 'list',
-          route: '/supplier',
-          requiredRole: 'ANY',
+          label: 'Nueva Venta',
+          icon: 'point_of_sale',
+          route: '/dashboard/new-sale',
         },
         {
-          label: 'Pagos',
-          icon: 'payments',
-          route: '/supplier-payment',
-          requiredRole: 'ANY',
-        },
-      ],
+          label: 'Mis Ventas',
+          icon: 'receipt_long',
+          route: '/dashboard/my-sales',
+        }
+      ]
     },
+    {
+      label: 'Ventas',
+      icon: 'shopping_cart',
+      route: '/sales',
+      requiredRole: 'ROLE_USER',
+      children: [
+        {
+          label: 'Nueva Venta',
+          icon: 'add_shopping_cart',
+          route: '/sales/new',
+        },
+        {
+          label: 'Historial',
+          icon: 'history',
+          route: '/sales/history',
+        }
+      ]
+    }
   ];
 
-  constructor(private authService: AuthService) {
-    // Filtramos los ítems del menú según el rol del usuario
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
+    const menuItems = this.isAdmin ? this.ADMIN_MENU_ITEMS : this.USER_MENU_ITEMS;
+    
     this.menuItems$ = this.authService.currentUser$.pipe(
-      map((user) => this.filterMenuItems(this.ALL_MENU_ITEMS, user?.role?.name))
+      map(() => this.filterMenuItems(menuItems))
+    );
+    this.initializeMenu();
+  }
+
+  ngOnInit(): void {
+    this.updateExpandedState(this.router.url);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initializeMenu(): void {
+    this.menuItems$ = this.authService.currentUser$.pipe(
+      tap(user => {
+        console.log('Current User:', user); // Debug
+        this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
+      }),
+      map(() => this.filterMenuItems(this.isAdmin ? this.ADMIN_MENU_ITEMS : this.USER_MENU_ITEMS))
     );
   }
 
-  ngOnInit() {
-    console.log('Sidebar component initialized');
-    this.menuItems$.subscribe(items => {
-      console.log('Menu items:', items);
-    });
-  }
+  // private setupRouterEvents(): void {
+  //   this.router.events
+  //     .pipe(
+  //       takeUntil(this.destroy$),
+  //       filter((event) => event instanceof NavigationEnd)
+  //     )
+  //     .subscribe((event: any) => {
+  //       this.updateExpandedState(event.url);
+  //     });
+  // }
 
-  // Método para filtrar los ítems del menú según el rol
-  private filterMenuItems(items: MenuItem[], userRole?: string): MenuItem[] {
-    return items.filter((item) => {
-      // Si el ítem es visible para todos los roles o el usuario tiene el rol requerido
-      const hasPermission =
-        item.requiredRole === 'ANY' || item.requiredRole === userRole;
+  private filterMenuItems(items: MenuItem[]): MenuItem[] {
+    console.log('Filtering items:', items); // Debug
+    return items.filter(item => {
+      const hasRole = !item.requiredRole || item.requiredRole === 'ANY' || 
+                     this.authService.hasRole(item.requiredRole);
 
-      // Si tiene submenús, los filtramos recursivamente
-      if (hasPermission && item.children) {
-        item.children = this.filterMenuItems(item.children, userRole);
+      if (item.children) {
+        const filteredChildren = this.filterMenuItems(item.children);
+        item.children = filteredChildren;
+        return filteredChildren.length > 0;
       }
 
-      return hasPermission;
+      return hasRole;
     });
   }
+
+  private updateExpandedState(currentRoute: string): void {
+    // Obtener los ítems según el rol
+    const menuItems = this.authService.hasRole('ROLE_ADMIN') 
+      ? this.ADMIN_MENU_ITEMS 
+      : this.USER_MENU_ITEMS;
+  
+    menuItems.forEach(item => {
+      if (item.children) {
+        // Expande el menú si la ruta actual comienza con la ruta del ítem
+        item.expanded = currentRoute.startsWith(item.route);
+        
+        // Recursivamente verifica los hijos
+        item.children.forEach(child => {
+          if (currentRoute.startsWith(child.route)) {
+            item.expanded = true;
+          }
+        });
+      }
+    });
+  }
+
+  onPanelOpened(selectedItem: MenuItem): void {
+    const menuItems = this.authService.hasRole('ROLE_ADMIN') 
+      ? this.ADMIN_MENU_ITEMS 
+      : this.USER_MENU_ITEMS;
+      
+    menuItems.forEach(item => {
+      if (item.children && item !== selectedItem) {
+        item.expanded = false;
+      }
+    });
+    
+    selectedItem.expanded = true;
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+  }
+
+  // private updateExpandedState(items: MenuItem[], currentRoute: string) {
+  //   items.forEach((item) => {
+  //     if (item.children) {
+  //       item.expanded = currentRoute.startsWith(item.route);
+  //       this.updateExpandedState(item.children, currentRoute);
+  //     }
+  //   });
+  // }
+
+  toggleExpanded(item: MenuItem) {
+    if (item.children) {
+      item.expanded = !item.expanded;
+    }
+  }
+
+  // isActive(route: string): boolean {
+  //   return this.activeRoute === route;
+  // }
 }

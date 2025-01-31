@@ -3,18 +3,20 @@
     <h1>Iniciar Sesión</h1>
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
+      <!-- Campo de usuario -->
       <mat-form-field appearance="outline">
         <mat-label class="white-text">Usuario</mat-label>
         <mat-icon matPrefix>person_outline</mat-icon>
         <input matInput formControlName="username">
-        <mat-error *ngIf="formControls.username?.errors?.['required']">
+        <mat-error *ngIf="formControls['username']?.errors?.['required']">
           El usuario es requerido
         </mat-error>
-        <mat-error *ngIf="formControls.username?.errors?.['minlength']">
+        <mat-error *ngIf="formControls['username']?.errors?.['minlength']">
           El usuario debe tener al menos 3 caracteres
         </mat-error>
       </mat-form-field>
 
+      <!-- Campo de contraseña -->
       <mat-form-field appearance="outline">
         <mat-label class="white-text">Contraseña</mat-label>
         <mat-icon matPrefix>lock_outline</mat-icon>
@@ -22,18 +24,20 @@
         <mat-icon matSuffix (click)="hidePassword = !hidePassword" style="cursor: pointer">
           {{hidePassword ? 'visibility_off' : 'visibility'}}
         </mat-icon>
-        <mat-error *ngIf="formControls.password?.errors?.['required']">
+        <mat-error *ngIf="formControls['password']?.errors?.['required']">
           La contraseña es requerida
         </mat-error>
-        <mat-error *ngIf="formControls.password?.errors?.['minlength']">
+        <mat-error *ngIf="formControls['password']?.errors?.['minlength']">
           La contraseña debe tener al menos 6 caracteres
         </mat-error>
       </mat-form-field>
 
-      <button class="primary-btn" mat-raised-button type="submit" [disabled]="loginForm.invalid || loginForm.disabled">
-        {{loginForm.disabled ? 'Iniciando sesión...' : 'Ingresar'}}
+      <!-- Botón de envío -->
+      <button class="primary-btn" mat-raised-button type="submit" [disabled]="loginForm.invalid">
+        Ingresar
       </button>
 
+      <!-- Mensaje de error global -->
       <mat-error *ngIf="errorMessage" class="error-message">
         {{errorMessage}}
       </mat-error>

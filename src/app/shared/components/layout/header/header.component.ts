@@ -26,14 +26,8 @@ export class HeaderComponent {
   }
 
   // Método para manejar el cierre de sesión
-  onLogout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/auth/login']);
-      },
-      error: (error) => {
-        console.error('Error al cerrar sesión:', error);
-      }
-    });
+  onLogout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }

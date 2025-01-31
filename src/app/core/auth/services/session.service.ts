@@ -3,17 +3,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { User } from '../models/user';
+import { Permission } from '../models/permission';
+import { environment } from 'src/enviroment/enviroment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class UserService {
+export class SessionService {
   // Usamos BehaviorSubject para mantener el estado del usuario actual
   // y permitir que múltiples componentes se suscriban a los cambios
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
-
-  private readonly API_URL = '/api/users';
+  private readonly API_URL = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) {
     // Al iniciar el servicio, intentamos recuperar el usuario del localStorage
@@ -24,8 +25,14 @@ export class UserService {
    * Obtiene el perfil del usuario actual desde el servidor
    * Útil para actualizar la información después del login
    */
-  getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${this.API_URL}/me`);
+  getCurrentUser(): User | null {
+    try {
+      const userStr = localStorage.getItem('current_user');
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
   }
 
   /**
@@ -33,9 +40,7 @@ export class UserService {
    * y en el almacenamiento local
    */
   setCurrentUser(user: User): void {
-    // Guardamos en localStorage para persistencia entre recargas
     localStorage.setItem('current_user', JSON.stringify(user));
-    // Actualizamos el BehaviorSubject para notificar a los suscriptores
     this.currentUserSubject.next(user);
   }
 
@@ -69,11 +74,10 @@ export class UserService {
    * Verifica si el usuario actual tiene un permiso específico
    */
   hasPermission(permissionCode: string): boolean {
-    const currentUser = this.currentUserSubject.value;
+    const currentUser = this.getCurrentUser();
     if (!currentUser?.role?.permissions) return false;
-    
     return currentUser.role.permissions.some(
-      (      permission: { code: string; }) => permission.code === permissionCode
+      (permission: Permission) => permission.code === permissionCode
     );
   }
 
@@ -81,9 +85,18 @@ export class UserService {
    * Verifica si el usuario actual tiene un rol específico
    */
   hasRole(roleName: string): boolean {
-    const currentUser = this.currentUserSubject.value;
+    const currentUser = this.getCurrentUser();
     if (!currentUser?.role) return false;
-    
     return currentUser.role.name === roleName;
+  }
+
+  // User Status Management
+  updateUserStatus(id: number, status: boolean): Observable<User> {
+    return this.http.patch<User>(`${this.API_URL}/${id}/status`, { status });
+  }
+
+  // Role Assignment
+  assignRole(userId: number, roleId: number): Observable<User> {
+    return this.http.put<User>(`${this.API_URL}/${userId}/roles/${roleId}`, {});
   }
 }

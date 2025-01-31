@@ -1,74 +1,67 @@
-// features/auth/login/login.component.ts
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/auth/services/auth.service';
-import { LoginRequest } from '../../../core/auth/models/login-request';
-
-interface LoginFormControls {
-  username: FormControl<string>;  // Note que ahora es string, no string | null
-  password: FormControl<string>;  // Note que ahora es string, no string | null
-}
+import { AuthService } from '@core/auth/services/auth.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent {
-  loginForm: FormGroup<LoginFormControls>;
+export class LoginComponent implements OnInit {
+  loginForm: FormGroup;
   hidePassword = true;
-  errorMessage: string | null = null;
+  errorMessage: string = '';
+  loading = false;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router
   ) {
-    // Inicializamos con valores por defecto vacíos pero no null
-    this.loginForm = this.fb.group<LoginFormControls>({
-      username: this.fb.control('', {
-        validators: [Validators.required, Validators.minLength(3)],
-        nonNullable: true  // Esto asegura que el valor nunca será null
-      }),
-      password: this.fb.control('', {
-        validators: [Validators.required, Validators.minLength(6)],
-        nonNullable: true  // Esto asegura que el valor nunca será null
-      })
+    // Redirigir si ya está autenticado
+    this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.router.navigate(['/dashboard']);
+      }
+    });
+
+    this.loginForm = this.formBuilder.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      return;
+  ngOnInit(): void {
+    // Si ya está autenticado, redirigir al dashboard
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
     }
-
-    this.loginForm.disable();
-    this.errorMessage = null;
-
-    // Convertimos explícitamente los valores a LoginRequest
-    const loginData: LoginRequest = {
-      username: this.loginForm.getRawValue().username,
-      password: this.loginForm.getRawValue().password
-    };
-
-    this.authService.login(loginData).subscribe({
-      next: (response) => {
-        console.log('Login exitoso:', response);
-        this.router.navigate(['/dashboard']);
-      },
-      error: (error) => {
-        console.error('Error en login:', error);
-        this.errorMessage = 'Credenciales inválidas';
-        this.loginForm.enable();
-      }
-    });
   }
 
   get formControls() {
-    return {
-      username: this.loginForm.get('username'),
-      password: this.loginForm.get('password')
-    };
+    return this.loginForm.controls;
+  }
+
+  onSubmit(): void {
+    if (this.loginForm.invalid || this.loading) {
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.authService
+      .login(this.loginForm.value)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+        },
+        error: (error) => {
+          console.error('Login error:', error);
+          this.errorMessage = 'Usuario o contraseña incorrectos';
+        },
+      });
   }
 }

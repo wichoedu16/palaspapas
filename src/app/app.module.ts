@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Componentes
@@ -24,7 +24,8 @@ import { MatMenuModule } from '@angular/material/menu';
 
 // Módulo de rutas
 import { AppRoutingModule } from './app-routing.module';
-
+import { ErrorInterceptor } from '@core/auth/interceptors/error.interceptor';
+import { AuthInterceptor } from '@core/auth/interceptors/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,7 @@ import { AppRoutingModule } from './app-routing.module';
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
-    
+
     // Módulos de Material Design
     MatSidenavModule,
     MatToolbarModule,
@@ -51,11 +52,13 @@ import { AppRoutingModule } from './app-routing.module';
     MatListModule,
     MatExpansionModule,
     MatMenuModule,
-    
+
     // Módulo de rutas
-    AppRoutingModule
+    AppRoutingModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

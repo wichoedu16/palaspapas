@@ -5,7 +5,7 @@ import { MainLayoutComponent } from '@shared/components/layout/main-layout/main-
 
 const routes: Routes = [
   {
-    path: 'auth',
+    path: 'login',
     loadChildren: () =>
       import('./features/auth/auth.module').then((m) => m.AuthModule),
   },

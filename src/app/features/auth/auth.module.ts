@@ -11,6 +11,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: LoginComponent
+  }
+];
 
 @NgModule({
   declarations: [
@@ -18,6 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   ],
   imports: [
     CommonModule,
+    RouterModule.forChild(routes),
     AuthRoutingModule,
     ReactiveFormsModule,
     MatCardModule,

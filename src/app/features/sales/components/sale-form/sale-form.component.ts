@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
 import { SaleService } from '../../services/sale.service';
-import { UserService } from '@core/auth/services/user.service';
+import { SessionService } from '@core/auth/services/session.service';
 import { ProductService } from '@features/products/services/product.service';
 import { Sale, SaleDetail } from '@features/sales/model/sale';
 
@@ -24,7 +24,7 @@ export class SaleFormComponent implements OnInit {
     private fb: FormBuilder,
     private datePipe: DatePipe,
     private saleService: SaleService,
-    private userService: UserService,
+    private userService: SessionService,
     private productService: ProductService,
     public dialogRef: MatDialogRef<SaleFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { sale: Sale }

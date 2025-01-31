@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/enviroment/enviroment';
 
 // Definimos la interfaz para los filtros que usaremos en las búsquedas
 interface InventoryFilters {
@@ -14,8 +15,7 @@ interface InventoryFilters {
   providedIn: 'root'
 })
 export class InventoryService {
-  // Definimos la URL base para las operaciones de inventario
-  private readonly API_URL = '/api/inventory';
+  private readonly API_URL = `${environment.apiUrl}/inventory`; // Usa la URL del entorno
 
   constructor(private http: HttpClient) {}
 
