@@ -3,7 +3,9 @@ package com.palaspapas.back.exception.handler;
 
 import com.palaspapas.back.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,6 +32,19 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception ex) {
+        log.error("Unexpected error occurred", ex);
+        return ResponseEntity.internalServerError().body(
+                new ErrorResponse(
+                        "INTERNAL_ERROR",
+                        "An unexpected error occurred",
+                        LocalDateTime.now()
+                )
+        );
+    }
+
+    // Manejo de errores de validación
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
@@ -41,25 +56,24 @@ public class GlobalExceptionHandler {
         });
 
         log.error("Validation error occurred: {}", errors);
-        return ResponseEntity.badRequest().body(
-                new ValidationErrorResponse(
-                        "VALIDATION_ERROR",
-                        "Validation failed",
-                        errors,
-                        LocalDateTime.now()
-                )
+        ValidationErrorResponse validationErrorResponse = new ValidationErrorResponse(
+                "VALIDATION_ERROR",
+                "Validation failed",
+                errors,
+                LocalDateTime.now()
         );
+        return ResponseEntity.badRequest().body(validationErrorResponse);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception ex) {
-        log.error("Unexpected error occurred", ex);
-        return ResponseEntity.internalServerError().body(
-                new ErrorResponse(
-                        "INTERNAL_ERROR",
-                        "An unexpected error occurred",
-                        LocalDateTime.now()
-                )
+    // Manejo de BadCredentialsException (credenciales incorrectas)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("Bad credentials exception occurred: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                "BAD_CREDENTIALS",
+                "Credenciales incorrectas",
+                LocalDateTime.now()
         );
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 }

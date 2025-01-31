@@ -8,4 +8,6 @@ import com.palaspapas.back.dto.response.AuthenticationResponse;
 public interface IAuthenticationService {
     AuthenticationResponse register(RegisterRequest request);
     AuthenticationResponse authenticate(AuthenticationRequest request);
+
+    AuthenticationResponse refreshToken(String token);
 }

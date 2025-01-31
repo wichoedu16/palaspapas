@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/v1/categories")
 @RequiredArgsConstructor
-@Tag(name = "Categories", description = "Endpoints para gestión de categorías")
+@Tag(name = "Categories", description = "API para gestión de categorías")
 @SecurityRequirement(name = "Bearer Authentication")
 public class CategoryController {
 
@@ -35,11 +35,8 @@ public class CategoryController {
     @Operation(summary = "Crear nueva categoría")
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
         log.debug("Crear categoría request recibido: {}", request);
-        // Convertir de DTO a Domain
         Category category = categoryMapper.toDomain(request);
-        // Llamar al servicio
         Category createdCategory = categoryService.create(category);
-        // Convertir de Domain a Response
         return new ResponseEntity<>(categoryMapper.toResponse(createdCategory),
                 HttpStatus.CREATED);
     }
