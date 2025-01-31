@@ -1,44 +1,81 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/auth/services/auth.service';
+import { DashboardService } from '../dashboard.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  // Propiedades para mostrar información del usuario
   currentUser$ = this.authService.currentUser$;
-  
-  // Datos para las tarjetas de resumen (mock data por ahora)
+  isAdmin = false;
+
+  constructor(
+    private authService: AuthService,
+    private dashboardService: DashboardService,
+    private router: Router
+  ) {  }
+
+  // Datos para las tarjetas de resumen
   summaryCards = [
     {
       title: 'Ventas del Día Anterior',
-      value: '$1,234.56',
+      value: 'Cargando...',
       icon: 'point_of_sale',
       color: 'primary',
-      // Esta información solo debería ser visible para administradores
-      requiresAdmin: true
+      requiresAdmin: this.isAdmin,
     },
     {
       title: 'Estado de Caja',
-      value: 'Por Cerrar',
+      value: 'Cargando...',
       icon: 'account_balance',
       color: 'warn',
-      requiresAdmin: true
+      requiresAdmin: this.isAdmin,
     },
     {
       title: 'Productos Bajo Stock',
-      value: '5',
+      value: 'Cargando...',
       icon: 'inventory',
       color: 'accent',
-      requiresAdmin: false
-    }
+      requiresAdmin: false,
+    },
   ];
-  
-  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    // Aquí cargaremos la información inicial del dashboard
+    this.loadDashboardData();
   }
+
+  // Método para navegar a Pagar a Proveedores
+  navigateToPaySuppliers(): void {
+    this.router.navigate(['/supplier-payment']);
+  }
+
+  // Método para navegar a Realizar Venta
+  navigateToMakeSale(): void {
+    this.router.navigate(['/sale']);
+  }
+
+  // Método para navegar a Revisar Inventario
+  navigateToCheckInventory(): void {
+    this.router.navigate(['/inventory']);
+  }
+
+  private loadDashboardData(): void {
+    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
+    console.log('es administrador:', this.isAdmin)
+    this.dashboardService.getDashboardData().subscribe({
+      next: (data) => {
+        this.summaryCards[0].value = `$${data.yesterdaySales}`; // Ventas del día anterior
+        this.summaryCards[1].value = data.cashStatus; // Estado de la caja
+        this.summaryCards[2].value = data.lowStockProducts.toString(); // Productos bajo stock
+      },
+      error: (error) => {
+        console.error('Error al cargar los datos del dashboard:', error);
+        this.summaryCards.forEach((card) => (card.value = 'Error'));
+      },
+    });
+  }
+
 }

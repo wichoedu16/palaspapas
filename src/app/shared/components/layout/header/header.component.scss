@@ -1,6 +1,7 @@
 .header {
   height: 75px; // Altura fija para coincidir con el sidebar
   background: var(--bg-secondary);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   padding: 0 1.5rem;
   display: flex;
   align-items: center;
