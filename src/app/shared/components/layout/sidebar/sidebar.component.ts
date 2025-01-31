@@ -31,19 +31,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       label: 'Dashboard',
       icon: 'dashboard',
       route: '/dashboard',
-      requiredRole: 'ROLE_ADMIN',
-      children: [
-        {
-          label: 'Resumen Ventas',
-          icon: 'bar_chart',
-          route: '/dashboard/sales',
-        },
-        {
-          label: 'Stock Bajo',
-          icon: 'warning',
-          route: '/dashboard/low-stock',
-        }
-      ]
     },
     {
       label: 'Administración',
@@ -69,7 +56,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       ]
     },
     {
-      label: 'Gestión Inventario',
+      label: 'Inventario',
       icon: 'inventory',
       route: '/inventory',
       requiredRole: 'ROLE_ADMIN',
@@ -175,23 +162,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private initializeMenu(): void {
     this.menuItems$ = this.authService.currentUser$.pipe(
       tap(user => {
-        console.log('Current User:', user); // Debug
+        console.log('Usuario conectado:', user?.firstName, user?.role?.name); // Debug
         this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
       }),
       map(() => this.filterMenuItems(this.isAdmin ? this.ADMIN_MENU_ITEMS : this.USER_MENU_ITEMS))
     );
   }
-
-  // private setupRouterEvents(): void {
-  //   this.router.events
-  //     .pipe(
-  //       takeUntil(this.destroy$),
-  //       filter((event) => event instanceof NavigationEnd)
-  //     )
-  //     .subscribe((event: any) => {
-  //       this.updateExpandedState(event.url);
-  //     });
-  // }
 
   private filterMenuItems(items: MenuItem[]): MenuItem[] {
     console.log('Filtering items:', items); // Debug

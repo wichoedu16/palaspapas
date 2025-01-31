@@ -61,7 +61,6 @@ export class AuthService {
       .post<AuthResponse>(`${this.API_URL}/authenticate`, credentials)
       .pipe(
         tap((response) => {
-          console.info('ingresando con el usuario: .', response.user?.firstName);
           if (response?.token && response?.user) {
             this.tokenService.saveToken(response.token);
             this.sessionService.setCurrentUser(response.user);
@@ -127,7 +126,6 @@ export class AuthService {
   }
 
   hasRole(roleName: string): boolean {
-    if (roleName === 'ANY') return this.isAuthenticated();
     const currentUser = this.getCurrentUser();
     return currentUser?.role?.name === roleName || false;
   }

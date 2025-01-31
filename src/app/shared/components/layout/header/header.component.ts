@@ -28,6 +28,6 @@ export class HeaderComponent {
   // Método para manejar el cierre de sesión
   onLogout() {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/login']);
   }
 }
