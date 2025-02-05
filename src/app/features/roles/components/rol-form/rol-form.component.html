@@ -1,0 +1,55 @@
+<div class="form-container">
+  <h2 mat-dialog-title>{{ isEditing ? 'Editar' : 'Nuevo' }} Rol</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div mat-dialog-content class="form-content">
+
+      <!-- Nombre -->
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="name" placeholder="Nombre del rol">
+        <mat-error *ngIf="form.get('name')?.errors?.['required']">
+          El nombre es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Descripción -->
+      <mat-form-field appearance="outline">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+      </mat-form-field>
+
+      <!-- Estado -->
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="A">Activo</mat-option>
+          <mat-option value="I">Inactivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Permisos -->
+    <section class="permissions-section">
+      <h3>Permisos</h3>
+      <span class="permissions-list-section">
+        <ul formArrayName="permissions">
+          <li *ngFor="let permission of permissions; let i = index">
+            <mat-checkbox [formControlName]="i">
+             {{permission.code}} - {{ permission.name }} 
+            </mat-checkbox>
+          </li>
+        </ul>
+      </span>
+    </section>
+
+
+    <!-- Botones de acción -->
+    <div mat-dialog-actions class="form-actions">
+      <button mat-button mat-dialog-close class="cancel-button">Cancelar</button>
+      <button mat-raised-button type="submit" [disabled]="form.invalid" class="submit-button yellow-button">
+        {{ isEditing ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </form>
+</div>

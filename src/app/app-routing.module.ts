@@ -22,11 +22,6 @@ const routes: Routes = [
           ),
       },
       {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full',
-      },
-      {
         path: 'inventory',
         loadChildren: () =>
           import('./features/inventory/inventory.module').then(
@@ -65,6 +60,21 @@ const routes: Routes = [
         path: 'sale',
         loadChildren: () =>
           import('./features/sales/sales.module').then((m) => m.SaleModule),
+      },
+      {
+        path: 'admin/permission',
+        loadChildren: () =>
+          import('./features/permissions/permissions.module').then((m) => m.PermissionsModule),
+      },
+      {
+        path: 'admin/rol',
+        loadChildren: () =>
+          import('./features/roles/roles.module').then((m) => m.RolesModule),
+      },
+      {
+        path: 'admin/user',
+        loadChildren: () =>
+          import('./features/users/users.module').then((m) => m.UsersModule),
       },
     ],
   },

@@ -24,8 +24,8 @@ import { MatMenuModule } from '@angular/material/menu';
 
 // Módulo de rutas
 import { AppRoutingModule } from './app-routing.module';
-import { ErrorInterceptor } from '@core/auth/interceptors/error.interceptor';
 import { AuthInterceptor } from '@core/auth/interceptors/auth.interceptor';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -33,9 +33,13 @@ import { AuthInterceptor } from '@core/auth/interceptors/auth.interceptor';
     MainLayoutComponent,
     HeaderComponent,
     SidebarComponent,
-    FooterComponent,
+    FooterComponent
   ],
   imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
     // Módulos Core de Angular
     BrowserModule,
     BrowserAnimationsModule,

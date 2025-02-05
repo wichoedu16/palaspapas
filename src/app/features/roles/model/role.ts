@@ -1,11 +1,11 @@
-import { Permission } from './permission';
+import { Permission } from "@features/permissions/model/permission";
 
 export interface Role {
   id: number;
   name: string;
   description: string;
   permissions: Permission[];
-  status: boolean;
+  status: string;
   createdAt: Date;
   updatedAt?: Date;
 }

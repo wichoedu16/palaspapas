@@ -15,11 +15,10 @@ interface InventoryFilters {
   providedIn: 'root'
 })
 export class DashboardService {
-  private readonly API_URL = `${environment.apiUrl}/dashboard`; // Usa la URL del entorno
+  private readonly API_URL = `${environment.apiUrl}/dashboard`;
 
   constructor(private http: HttpClient) {}
 
-  // Método para obtener los datos del dashboard
   getDashboardData(): Observable<any> {
     return this.http.get<any>(`${this.API_URL}/summary`);
   }

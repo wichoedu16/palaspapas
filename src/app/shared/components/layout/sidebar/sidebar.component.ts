@@ -1,19 +1,10 @@
 // sidebar.component.ts
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, of, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { AuthService } from '@core/auth/services/auth.service';
 import { Router } from '@angular/router';
-
-interface MenuItem {
-  label: string;
-  icon: string;
-  route: string;
-  requiredRole?: string;
-  requiredPermission?: string;
-  children?: MenuItem[];
-  expanded?: boolean; // Para controlar la expansión de submenús
-}
+import { MenuItem } from '@shared/models/menu-item';
 
 @Component({
   selector: 'app-sidebar',
@@ -22,7 +13,7 @@ interface MenuItem {
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  menuItems$: Observable<MenuItem[]> | undefined;
+  menuItems$!: Observable<MenuItem[]>;
   currentUser$ = this.authService.currentUser$;
   isAdmin = false;
 
@@ -38,19 +29,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/admin',
       children: [
         {
-          label: 'Usuarios',
-          icon: 'people',
-          route: '/admin/users',
+          label: 'Permisos',
+          icon: 'key',
+          route: '/admin/permission',
         },
         {
           label: 'Roles',
           icon: 'security',
-          route: '/admin/roles',
+          route: '/admin/rol',
         },
         {
-          label: 'Permisos',
-          icon: 'key',
-          route: '/admin/permissions',
+          label: 'Usuarios',
+          icon: 'people',
+          route: '/admin/user',
         },
       ],
     },
@@ -165,70 +156,58 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private authService: AuthService, private router: Router) {
-    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
-    const menuItems = this.isAdmin
-      ? this.ADMIN_MENU_ITEMS
-      : this.USER_MENU_ITEMS;
-
-    this.menuItems$ = this.authService.currentUser$.pipe(
-      map(() => this.filterMenuItems(menuItems))
-    );
-    this.initializeMenu();
-  }
-
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
+ 
   ngOnInit(): void {
-    this.updateExpandedState(this.router.url);
+    this.menuItems$ = this.authService.currentUser$.pipe(
+      map((user) => {
+        this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
+        const menuItems = this.isAdmin 
+          ? this.ADMIN_MENU_ITEMS 
+          : this.USER_MENU_ITEMS;
+        
+        this.updateExpandedState(this.router.url);
+        
+        return this.filterMenuItems(menuItems);
+      })
+    );
   }
-
+ 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
-  private initializeMenu(): void {
-    this.menuItems$ = this.authService.currentUser$.pipe(
-      tap((user) => {
-        console.log('Usuario conectado:', user?.firstName, user?.role?.name); // Debug
-        this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
-      }),
-      map(() =>
-        this.filterMenuItems(
-          this.isAdmin ? this.ADMIN_MENU_ITEMS : this.USER_MENU_ITEMS
-        )
-      )
-    );
-  }
-
+ 
   private filterMenuItems(items: MenuItem[]): MenuItem[] {
     return items.filter((item) => {
       const hasRole =
         !item.requiredRole ||
         item.requiredRole === 'ANY' ||
         this.authService.hasRole(item.requiredRole);
-
+ 
       if (item.children) {
         const filteredChildren = this.filterMenuItems(item.children);
         item.children = filteredChildren;
         return filteredChildren.length > 0;
       }
-
+ 
       return hasRole;
     });
   }
-
+ 
   private updateExpandedState(currentRoute: string): void {
-    // Obtener los ítems según el rol
     const menuItems = this.authService.hasRole('ROLE_ADMIN')
       ? this.ADMIN_MENU_ITEMS
       : this.USER_MENU_ITEMS;
-
+ 
     menuItems.forEach((item) => {
       if (item.children) {
-        // Expande el menú si la ruta actual comienza con la ruta del ítem
         item.expanded = currentRoute.startsWith(item.route);
-
-        // Recursivamente verifica los hijos
+ 
         item.children.forEach((child) => {
           if (currentRoute.startsWith(child.route)) {
             item.expanded = true;
@@ -237,41 +216,28 @@ export class SidebarComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+ 
   onPanelOpened(selectedItem: MenuItem): void {
     const menuItems = this.authService.hasRole('ROLE_ADMIN')
       ? this.ADMIN_MENU_ITEMS
       : this.USER_MENU_ITEMS;
-
+ 
     menuItems.forEach((item) => {
       if (item.children && item !== selectedItem) {
         item.expanded = false;
       }
     });
-
+ 
     selectedItem.expanded = true;
   }
-
+ 
   onLogout(): void {
     this.authService.logout();
   }
-
-  // private updateExpandedState(items: MenuItem[], currentRoute: string) {
-  //   items.forEach((item) => {
-  //     if (item.children) {
-  //       item.expanded = currentRoute.startsWith(item.route);
-  //       this.updateExpandedState(item.children, currentRoute);
-  //     }
-  //   });
-  // }
-
-  toggleExpanded(item: MenuItem) {
+ 
+  toggleExpanded(item: MenuItem): void {
     if (item.children) {
       item.expanded = !item.expanded;
     }
   }
-
-  // isActive(route: string): boolean {
-  //   return this.activeRoute === route;
-  // }
-}
+ }

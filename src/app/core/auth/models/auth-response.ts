@@ -1,4 +1,4 @@
-import { User } from "./user";
+import { User } from "../../../features/users/model/user";
 
 export interface LoginRequest {
   username: string;

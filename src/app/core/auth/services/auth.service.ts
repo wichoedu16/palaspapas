@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { SessionService } from './session.service';
 import { environment } from 'src/enviroment/enviroment';
-import { User } from '../models/user';
+import { User } from '../../../features/users/model/user';
 
 @Injectable({
   providedIn: 'root',

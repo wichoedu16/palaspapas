@@ -2,8 +2,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { User } from '../models/user';
-import { Permission } from '../models/permission';
+import { User } from '../../../features/users/model/user';
+import { Permission } from '@features/permissions/model/permission';
 import { environment } from 'src/enviroment/enviroment';
 
 @Injectable({
